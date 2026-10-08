@@ -16,11 +16,11 @@ interface KisanApiService {
     ): Map<String, List<DynamicTile>>
 
     @GET("api/v1/seeds")
-    suspend fun getSeeds(
+    suspend fun getSeedVarieties(
         @Query("category") category: String? = null,
         @Query("q") query: String? = null,
         @Query("lang") lang: String = "hi"
-    ): Map<String, Any>
+    ): Map<String, List<SeedVariety>>
 
     @GET("api/v1/organic/recipes")
     suspend fun getOrganicRecipes(
