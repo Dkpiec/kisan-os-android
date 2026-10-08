@@ -30,9 +30,15 @@ class MainActivity : ComponentActivity() {
         apiService = KisanApiService.create(SERVER_BASE_URL)
 
         setContent {
+            var isFirstLaunch by remember { mutableStateOf(true) }
             var currentLang by remember { mutableStateOf("hi") }
             var isDarkTheme by remember { mutableStateOf(false) }
-            var currentScreen by remember { mutableStateOf("hub") }
+            var currentScreen by remember { mutableStateOf("hub") } // "hub", "auth", "seed_catalog", "organic_hub", "gis_polyline", "mandi_arbitrage"
+
+            // Auth State
+            var isLoggedIn by remember { mutableStateOf(false) }
+            var userName by remember { mutableStateOf<String?>(null) }
+            var authToken by remember { mutableStateOf<String?>(null) }
 
             var tiles by remember {
                 mutableStateOf(
@@ -96,41 +102,66 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    when (currentScreen) {
-                        "hub" -> MainHubScreen(
-                            tiles = tiles,
-                            currentLang = currentLang,
-                            isDarkTheme = isDarkTheme,
-                            onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
-                            onThemeToggle = { isDarkTheme = !isDarkTheme },
-                            onTileClick = { route -> currentScreen = route }
+                    if (isFirstLaunch) {
+                        LanguageSelectionScreen(
+                            onLanguageSelected = { lang ->
+                                currentLang = lang
+                                isFirstLaunch = false
+                            }
                         )
-                        "seed_catalog" -> SeedCatalogScreen(
-                            seeds = seeds,
-                            currentLang = currentLang,
-                            onBack = { currentScreen = "hub" }
-                        )
-                        "organic_hub" -> OrganicHubScreen(
-                            recipes = recipes,
-                            currentLang = currentLang,
-                            onBack = { currentScreen = "hub" }
-                        )
-                        "gis_polyline" -> GisPolylineScreen(
-                            currentLang = currentLang,
-                            onBack = { currentScreen = "hub" }
-                        )
-                        "mandi_arbitrage" -> MandiArbitrageScreen(
-                            currentLang = currentLang,
-                            onBack = { currentScreen = "hub" }
-                        )
-                        else -> MainHubScreen(
-                            tiles = tiles,
-                            currentLang = currentLang,
-                            isDarkTheme = isDarkTheme,
-                            onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
-                            onThemeToggle = { isDarkTheme = !isDarkTheme },
-                            onTileClick = { route -> currentScreen = route }
-                        )
+                    } else {
+                        when (currentScreen) {
+                            "auth" -> AuthScreen(
+                                lang = currentLang,
+                                onAuthSuccess = { user, token ->
+                                    isLoggedIn = true
+                                    userName = user
+                                    authToken = token
+                                    currentScreen = "hub"
+                                },
+                                onSkip = { currentScreen = "hub" }
+                            )
+                            "hub" -> MainHubScreen(
+                                tiles = tiles,
+                                currentLang = currentLang,
+                                isDarkTheme = isDarkTheme,
+                                onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
+                                onThemeToggle = { isDarkTheme = !isDarkTheme },
+                                onTileClick = { route -> currentScreen = route },
+                                onAuthClick = { currentScreen = "auth" },
+                                isLoggedIn = isLoggedIn,
+                                userName = userName
+                            )
+                            "seed_catalog" -> SeedCatalogScreen(
+                                seeds = seeds,
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "organic_hub" -> OrganicHubScreen(
+                                recipes = recipes,
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "gis_polyline" -> GisPolylineScreen(
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "mandi_arbitrage" -> MandiArbitrageScreen(
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            else -> MainHubScreen(
+                                tiles = tiles,
+                                currentLang = currentLang,
+                                isDarkTheme = isDarkTheme,
+                                onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
+                                onThemeToggle = { isDarkTheme = !isDarkTheme },
+                                onTileClick = { route -> currentScreen = route },
+                                onAuthClick = { currentScreen = "auth" },
+                                isLoggedIn = isLoggedIn,
+                                userName = userName
+                            )
+                        }
                     }
                 }
             }
