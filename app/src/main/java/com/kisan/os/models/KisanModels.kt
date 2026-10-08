@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class DynamicTile(
     @SerializedName("tile_id") val tileId: String,
-    @SerializedName("title") val title: String,
+    @SerializedName("title") val title: String = "",
     @SerializedName("title_en") val titleEn: String,
     @SerializedName("title_hi") val titleHi: String,
     @SerializedName("category") val category: String,
@@ -72,4 +72,25 @@ data class PlotAreaResult(
     @SerializedName("plot_name") val plotName: String,
     @SerializedName("centroid") val centroid: Map<String, Double>,
     @SerializedName("measurements") val measurements: Map<String, Any>
+)
+
+data class PolyhouseCrop(
+    val titleEn: String,
+    val titleHi: String,
+    val structureType: String,
+    val recommendedCrops: List<String>,
+    val expectedReturnPerAcre: String,
+    val subsidyAvailable: String,
+    val climateControlTips: String
+)
+
+data class CropSelectionAdvisory(
+    val cropNameEn: String,
+    val cropNameHi: String,
+    val season: String,
+    val soilType: String,
+    val waterLevel: String,
+    val estimatedProfit: String,
+    val bestVarieties: String,
+    val durationDays: Int
 )

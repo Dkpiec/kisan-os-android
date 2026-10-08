@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
             var isFirstLaunch by remember { mutableStateOf(true) }
             var currentLang by remember { mutableStateOf("hi") }
             var isDarkTheme by remember { mutableStateOf(false) }
-            var currentScreen by remember { mutableStateOf("hub") } // "hub", "auth", "seed_catalog", "organic_hub", "gis_polyline", "mandi_arbitrage"
+            var currentScreen by remember { mutableStateOf("hub") } // "hub", "auth", "seed_catalog", "organic_hub", "gis_polyline", "mandi_arbitrage", "protective_cultivation", "crop_selector", "weather_advisory"
 
             // Auth State
             var isLoggedIn by remember { mutableStateOf(false) }
@@ -43,42 +43,23 @@ class MainActivity : ComponentActivity() {
             var tiles by remember {
                 mutableStateOf(
                     listOf(
-                        DynamicTile("t1", "Seed Catalog", "Seeds & Taste Catalog", "उन्नत बीज एवं स्वाद किस्में", "knowledge", "spa", "#10B981", "seed_catalog", 1),
-                        DynamicTile("t2", "Organic Recipes", "Organic & JADAM Hub", "जैविक व जादम खाद-दवा", "organic", "biotech", "#059669", "organic_hub", 2),
-                        DynamicTile("t3", "GIS Land Area", "GIS Land & Polyline", "खेत नक्शा व रकबा नाप", "gis", "map", "#3B82F6", "gis_polyline", 3),
-                        DynamicTile("t4", "Mandi Arbitrage", "150km Mandi Arbitrage", "150km मंडी भाव व मुनाफा", "market", "trending_up", "#F59E0B", "mandi_arbitrage", 4)
+                        DynamicTile("t1", "Seed Catalogue", "Seeds & Taste Catalog", "उन्नत बीज कैटलॉग", "agronomy", "spa", "#10B981", "seed_catalog", 1),
+                        DynamicTile("t2", "Organic Farming", "Organic & JADAM Hub", "जैविक खेती एवं जादम", "organic", "biotech", "#059669", "organic_hub", 2),
+                        DynamicTile("t3", "Protective Cultivation", "Polyhouse & Net House", "संरक्षित खेती तकनीक", "technology", "roofing", "#8B5CF6", "protective_cultivation", 3),
+                        DynamicTile("t4", "Mandi Arbitrage", "150km Mandi Arbitrage", "150km मंडी आर्बिट्राज", "market", "trending_up", "#F59E0B", "mandi_arbitrage", 4),
+                        DynamicTile("t5", "Crop Selector", "Smart Crop Planning", "फसल चयन व लाभ योजना", "planning", "psychology", "#EC4899", "crop_selector", 5),
+                        DynamicTile("t6", "Weather Update", "Weather & Spray Advisories", "मौसम व छिड़काव परामर्श", "weather", "cloud", "#0EA5E9", "weather_advisory", 6),
+                        DynamicTile("t7", "GIS Land Area", "GIS Land & Polyline", "खेत नक्शा व रकबा नाप", "gis", "map", "#3B82F6", "gis_polyline", 7)
                     )
                 )
             }
 
             var seeds by remember {
-                mutableStateOf(
-                    listOf(
-                        SeedVariety("s1", "vegetable", "Tomato (टमाटर)", "Pusa Rohini", "ICAR-IARI", "Rich tangy flavor, ideal for gravy curries", "Aug-Nov & Dec-Feb", 110, "100-150g", "160-200 Q/Acre", "Early blight & fruit cracking resistant", "Semi-determinate, uniform red fruits", 4.9),
-                        SeedVariety("s2", "vegetable", "Chilli (हरी मिर्च)", "US 341", "US Agriseeds", "High pungency (teekhi), glossy dark green", "June-July & Oct-Nov", 130, "80-100g", "80-120 Q/Acre (Green)", "LCV (Leaf Curl Virus) tolerant", "High market price in wholesale mandis", 4.8),
-                        SeedVariety("s3", "grain", "Wheat (गेहूँ)", "DBW 327 (Karan Shivani)", "ICAR-IIWBR", "Superior chapati quality, sweet taste, high grain puffing", "Nov 01 - Nov 20", 155, "40-45 kg", "32-35 Q/Acre", "High resistance to Yellow & Brown Rust", "Biofortified with Zinc & Iron", 4.9),
-                        SeedVariety("s4", "pulse", "Gram / Chana (चना)", "Pusa 3043", "ICAR-IARI", "Tender nutty desi taste, excellent for sattu/besan", "Oct 15 - Nov 10", 115, "25-30 kg", "10-12 Q/Acre", "High wilt and root rot resistance", "Semi-erect, drought resilient", 4.8)
-                    )
-                )
+                mutableStateOf(emptyList<SeedVariety>())
             }
 
             var recipes by remember {
-                mutableStateOf(
-                    listOf(
-                        OrganicRecipe(
-                            "r1", "jadam", "JADAM Sulfur (जादम सल्फर - JS)", "Organic broad-spectrum fungicide and miticide", 1, 365,
-                            listOf(mapOf("item" to "Sulfur powder (99.9%)", "qty" to "25 kg"), mapOf("item" to "Caustic Soda (NaOH)", "qty" to "20 kg"), mapOf("item" to "Red clay powder", "qty" to "500 g")),
-                            "Mix sulfur, clay, and rock salt in a 100L heat-resistant container. Add caustic soda and 50L water. Stir continuously with a wooden pole as self-boiling exothermic reaction reaches 80-100°C. Once liquid turns dark ruby red, allow to cool and settle for 24 hours. Decant clear supernatant.",
-                            "1.5 to 2.0 Litres", "30 ml to 50 ml", "Powdery mildew, downy mildew, red mites, fungal spots", "Wear eye protection and gloves. Exothermic reaction produces intense heat."
-                        ),
-                        OrganicRecipe(
-                            "r2", "zbnf", "Jeevamrut (जीवामृत)", "Soil biological inoculant & microbial booster", 3, 7,
-                            listOf(mapOf("item" to "Desi Cow Dung", "qty" to "10 kg"), mapOf("item" to "Desi Cow Urine", "qty" to "10 L"), mapOf("item" to "Jaggery (Gud)", "qty" to "2 kg"), mapOf("item" to "Besan (Gram flour)", "qty" to "2 kg"), mapOf("item" to "Virgin Soil", "qty" to "Handful")),
-                            "In a 200L barrel, mix cow dung and urine. Add jaggery and besan dissolved in water, plus virgin soil. Fill with 200L water. Stir clockwise 2-3 minutes twice daily in shade. Ready in 48-72 hours when sweet fermentation aroma appears.",
-                            "200 Litres (Flood/Drip)", "100 ml (Foliar spray)", "Enriches soil microbiology, unlocks fixed NPK, promotes root growth", "Use within 7 days of preparation. Keep barrel in shade covered with jute bag."
-                        )
-                    )
-                )
+                mutableStateOf(emptyList<OrganicRecipe>())
             }
 
             val scope = rememberCoroutineScope()
@@ -87,10 +68,19 @@ class MainActivity : ComponentActivity() {
                 scope.launch {
                     try {
                         val tilesResp = withContext(Dispatchers.IO) { apiService.getDynamicTiles(currentLang) }
-                        tiles = tilesResp["tiles"] ?: tiles
+                        if (!tilesResp["tiles"].isNullOrEmpty()) {
+                            tiles = tilesResp["tiles"]!!
+                        }
 
                         val recipesResp = withContext(Dispatchers.IO) { apiService.getOrganicRecipes(lang = currentLang) }
-                        recipes = recipesResp["recipes"] ?: recipes
+                        if (!recipesResp["recipes"].isNullOrEmpty()) {
+                            recipes = recipesResp["recipes"]!!
+                        }
+
+                        val seedsResp = withContext(Dispatchers.IO) { apiService.getSeedVarieties(lang = currentLang) }
+                        if (!seedsResp["varieties"].isNullOrEmpty()) {
+                            seeds = seedsResp["varieties"]!!
+                        }
                     } catch (e: Exception) {
                         // Keep built-in seeds and recipes
                     }
@@ -142,11 +132,24 @@ class MainActivity : ComponentActivity() {
                                 currentLang = currentLang,
                                 onBack = { currentScreen = "hub" }
                             )
-                            "gis_polyline" -> GisPolylineScreen(
+                            "protective_cultivation" -> ProtectiveCultivationScreen(
                                 currentLang = currentLang,
                                 onBack = { currentScreen = "hub" }
                             )
                             "mandi_arbitrage" -> MandiArbitrageScreen(
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "crop_selector" -> CropSelectorScreen(
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "weather_advisory" -> WeatherAdvisoryScreen(
+                                advisory = null,
+                                currentLang = currentLang,
+                                onBack = { currentScreen = "hub" }
+                            )
+                            "gis_polyline" -> GisPolylineScreen(
                                 currentLang = currentLang,
                                 onBack = { currentScreen = "hub" }
                             )

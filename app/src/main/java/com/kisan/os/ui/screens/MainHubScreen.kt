@@ -47,7 +47,7 @@ fun MainHubScreen(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.width(300.dp)
+                modifier = Modifier.width(310.dp)
             ) {
                 // Drawer Header
                 Surface(
@@ -68,7 +68,7 @@ fun MainHubScreen(
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "KisanOS (किसान ओएस)",
+                            text = "Kisan Mitra (किसान मित्र)",
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
@@ -86,14 +86,14 @@ fun MainHubScreen(
                 // Navigation Items
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    label = { Text(if (isHi) "मुख्य पृष्ठ (Home Hub)" else "Home Hub") },
+                    label = { Text(if (isHi) "मुख्य पृष्ठ (Home)" else "Home Hub") },
                     selected = true,
                     onClick = { scope.launch { drawerState.close() } }
                 )
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Spa, contentDescription = null) },
-                    label = { Text(if (isHi) "उन्नत बीज ज्ञान (Seed Catalog)" else "Seed Catalog") },
+                    label = { Text(if (isHi) "बीज कैटलॉग (Seed Catalogue)" else "Seed Catalogue") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -103,7 +103,7 @@ fun MainHubScreen(
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Biotech, contentDescription = null) },
-                    label = { Text(if (isHi) "जैविक व जादम खाद (Organic Hub)" else "Organic & JADAM Hub") },
+                    label = { Text(if (isHi) "जैविक खेती (Organic Farming)" else "Organic Farming") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -112,18 +112,18 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
-                    label = { Text(if (isHi) "खेत नक्शा व रकबा (GIS Polyline)" else "GIS Land Mapper") },
+                    icon = { Icon(Icons.Default.Roofing, contentDescription = null) },
+                    label = { Text(if (isHi) "संरक्षित खेती (Protective Cultivation)" else "Protective Cultivation") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
-                        onTileClick("gis_polyline")
+                        onTileClick("protective_cultivation")
                     }
                 )
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
-                    label = { Text(if (isHi) "150km मंडी भाव (Mandi Arbitrage)" else "150km Mandi Arbitrage") },
+                    label = { Text(if (isHi) "मंडी आर्बिट्राज (Mandi Arbitrage)" else "Mandi Arbitrage") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -131,7 +131,37 @@ fun MainHubScreen(
                     }
                 )
 
-                Divider(modifier = Modifier.padding(vertical = 12.dp))
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Psychology, contentDescription = null) },
+                    label = { Text(if (isHi) "फसल चयनकर्ता (Crop Selector)" else "Crop Selector") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onTileClick("crop_selector")
+                    }
+                )
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Cloud, contentDescription = null) },
+                    label = { Text(if (isHi) "मौसम अपडेट (Weather Update)" else "Weather Update") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onTileClick("weather_advisory")
+                    }
+                )
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
+                    label = { Text(if (isHi) "खेत रकबा नाप (GIS Land Area)" else "GIS Land Area") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onTileClick("gis_polyline")
+                    }
+                )
+
+                Divider(modifier = Modifier.padding(vertical = 10.dp))
 
                 // Settings & Preferences
                 NavigationDrawerItem(
@@ -186,7 +216,7 @@ fun MainHubScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = if (isHi) "किसान OS" else "Kisan OS",
+                                    text = if (isHi) "किसान मित्र" else "Kisan Mitra",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 19.sp
                                 )
@@ -305,7 +335,7 @@ fun MainHubScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = if (isHi) "मुख्य कृषि सेवाएं (Tiles)" else "Agricultural Services",
+                    text = if (isHi) "कृषि सेवाएं (Agriculture Services)" else "Agriculture Services",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground
@@ -348,10 +378,11 @@ fun HubTileCard(
     val iconVector: ImageVector = when (tile.icon) {
         "spa" -> Icons.Default.Spa
         "biotech" -> Icons.Default.Biotech
-        "map" -> Icons.Default.Map
+        "roofing" -> Icons.Default.Roofing
         "trending_up" -> Icons.Default.TrendingUp
+        "psychology" -> Icons.Default.Psychology
         "cloud" -> Icons.Default.Cloud
-        "home" -> Icons.Default.Home
+        "map" -> Icons.Default.Map
         else -> Icons.Default.Eco
     }
 

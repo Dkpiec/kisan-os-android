@@ -2,9 +2,12 @@ package com.kisan.os.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,14 +15,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kisan.os.models.MandiArbitrageItem
-import com.kisan.os.ui.theme.KisanAmber
 import com.kisan.os.ui.theme.KisanEmerald
-import com.kisan.os.ui.theme.KisanLeafGreen
+
+data class MandiRecord(
+    val state: String,
+    val district: String,
+    val mandiName: String,
+    val commodity: String,
+    val modalPrice: Double,
+    val minPrice: Double,
+    val maxPrice: Double,
+    val arrivalQ: Double,
+    val distanceKm: Double,
+    val netPayout: Double
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,63 +41,75 @@ fun MandiArbitrageScreen(
     currentLang: String,
     onBack: () -> Unit
 ) {
-    var commodity by remember { mutableStateOf("Tomato (टमाटर)") }
-    var produceQuintals by remember { mutableStateOf("50") }
+    val isHi = currentLang == "hi"
 
-    val sampleMandis = listOf(
-        MandiArbitrageItem(
-            mandiName = "Azadpur APMC",
-            district = "Delhi",
-            state = "Delhi",
-            distanceKm = 42.0,
-            modalPrice = 2850.0,
-            grossRevenue = 142500.0,
-            transportCost = 1008.0,
-            mandiCess = 2137.5,
-            netPayout = 139354.5,
-            netRate = 2787.09,
-            profitRank = 1,
-            isBestDeal = true
-        ),
-        MandiArbitrageItem(
-            mandiName = "Sonipat Mandi",
-            district = "Sonipat",
-            state = "Haryana",
-            distanceKm = 18.0,
-            modalPrice = 2520.0,
-            grossRevenue = 126000.0,
-            transportCost = 432.0,
-            mandiCess = 1890.0,
-            netPayout = 123678.0,
-            netRate = 2473.56,
-            profitRank = 2,
-            isBestDeal = false
-        ),
-        MandiArbitrageItem(
-            mandiName = "Meerut Mandi",
-            district = "Meerut",
-            state = "Uttar Pradesh",
-            distanceKm = 78.0,
-            modalPrice = 2700.0,
-            grossRevenue = 135000.0,
-            transportCost = 1872.0,
-            mandiCess = 2025.0,
-            netPayout = 131103.0,
-            netRate = 2622.06,
-            profitRank = 3,
-            isBestDeal = false
+    var selectedState by remember { mutableStateOf("All") }
+    var selectedDistrict by remember { mutableStateOf("All") }
+    var produceQuintals by remember { mutableStateOf("40") }
+
+    val masterMandis = remember {
+        listOf(
+            // Delhi Mandis
+            MandiRecord("Delhi", "North Delhi", "Azadpur Mandi (आजादपुर मंडी)", "Tomato (टमाटर)", 2850.0, 2400.0, 3200.0, 1450.0, 45.0, 2690.0),
+            MandiRecord("Delhi", "North Delhi", "Azadpur Mandi (आजादपुर मंडी)", "Chilli (हरी मिर्च)", 5800.0, 5200.0, 6400.0, 620.0, 45.0, 5640.0),
+            MandiRecord("Delhi", "East Delhi", "Ghazipur Mandi (गाजीपुर मंडी)", "Tomato (टमाटर)", 2720.0, 2300.0, 3050.0, 920.0, 35.0, 2580.0),
+            MandiRecord("Delhi", "North Delhi", "Narela Mandi (नरेला अनाज मंडी)", "Wheat (गेहूँ)", 2650.0, 2450.0, 2800.0, 2800.0, 40.0, 2510.0),
+            MandiRecord("Delhi", "North Delhi", "Narela Mandi (नरेला अनाज मंडी)", "Basmati Rice (धान)", 4250.0, 3900.0, 4500.0, 1850.0, 40.0, 4110.0),
+            MandiRecord("Delhi", "West Delhi", "Keshopur Mandi (केशोपुर मंडी)", "Onion (प्याज)", 3400.0, 2900.0, 3700.0, 1100.0, 28.0, 3290.0),
+
+            // Haryana Mandis
+            MandiRecord("Haryana", "Sonipat", "Sonipat Mandi (सोनीपत अनाज मंडी)", "Wheat (गेहूँ)", 2580.0, 2400.0, 2700.0, 1800.0, 55.0, 2430.0),
+            MandiRecord("Haryana", "Sonipat", "Ganaur Mandi (गन्नौर फल मंडी)", "Tomato (टमाटर)", 2500.0, 2100.0, 2850.0, 780.0, 65.0, 2320.0),
+            MandiRecord("Haryana", "Karnal", "Karnal Mandi (करनाल मंडी)", "Basmati Rice (धान)", 4380.0, 4000.0, 4650.0, 3200.0, 125.0, 4090.0),
+            MandiRecord("Haryana", "Karnal", "Taraori Mandi (तरावड़ी बासमती मंडी)", "Basmati Rice (धान)", 4450.0, 4100.0, 4750.0, 2400.0, 138.0, 4140.0),
+            MandiRecord("Haryana", "Panipat", "Panipat Mandi (पानीपत मंडी)", "Mustard (सरसों)", 5650.0, 5200.0, 5900.0, 1200.0, 90.0, 5420.0),
+            MandiRecord("Haryana", "Gurugram", "Gurugram Mandi (गुरुग्राम मंडी)", "Vegetables (सब्जियां)", 3100.0, 2600.0, 3500.0, 650.0, 32.0, 2980.0),
+            MandiRecord("Haryana", "Faridabad", "Ballabhgarh Mandi (बल्लभगढ़ मंडी)", "Wheat (गेहूँ)", 2520.0, 2350.0, 2650.0, 950.0, 42.0, 2390.0),
+
+            // Uttar Pradesh (UP) Mandis
+            MandiRecord("Uttar Pradesh", "Gautam Buddha Nagar", "Noida Phase-2 Mandi (नोएडा मंडी)", "Vegetables (सब्जियां)", 3200.0, 2700.0, 3600.0, 890.0, 18.0, 3130.0),
+            MandiRecord("Uttar Pradesh", "Ghaziabad", "Sahibabad Mandi (साहिबाबाद सब्जी मंडी)", "Tomato (टमाटर)", 2780.0, 2350.0, 3150.0, 1300.0, 22.0, 2690.0),
+            MandiRecord("Uttar Pradesh", "Ghaziabad", "Ghaziabad Grain Mandi (गाजियाबाद अनाज मंडी)", "Wheat (गेहूँ)", 2540.0, 2380.0, 2680.0, 1600.0, 25.0, 2445.0),
+            MandiRecord("Uttar Pradesh", "Meerut", "Meerut APMC (मेरठ नवीन मंडी)", "Basmati Rice (धान)", 4150.0, 3800.0, 4400.0, 2100.0, 72.0, 3960.0),
+            MandiRecord("Uttar Pradesh", "Meerut", "Meerut APMC (मेरठ गुड़ मंडी)", "Jaggery / Gur (गुड़)", 3900.0, 3600.0, 4200.0, 1400.0, 72.0, 3720.0),
+            MandiRecord("Uttar Pradesh", "Bulandshahr", "Bulandshahr Mandi (बुलंदशहर मंडी)", "Mustard (सरसों)", 5550.0, 5100.0, 5800.0, 950.0, 78.0, 5340.0),
+            MandiRecord("Uttar Pradesh", "Hapur", "Hapur Mandi (हापुड़ कृषि मंडी)", "Wheat (गेहूँ)", 2590.0, 2420.0, 2720.0, 1750.0, 60.0, 2440.0),
+            MandiRecord("Uttar Pradesh", "Aligarh", "Aligarh Mandi (अलीगढ़ अनाज मंडी)", "Pigeon Pea / Arhar (तुअर दाल)", 7400.0, 6800.0, 7900.0, 600.0, 130.0, 7060.0),
+            MandiRecord("Uttar Pradesh", "Agra", "Agra Mandi (आगरा आलू मंडी)", "Potato (आलू)", 1650.0, 1400.0, 1850.0, 4200.0, 180.0, 1320.0)
         )
-    )
+    }
+
+    val states = listOf("All", "Delhi", "Haryana", "Uttar Pradesh")
+
+    val districtsForState = remember(selectedState) {
+        if (selectedState == "All") {
+            listOf("All") + masterMandis.map { it.district }.distinct()
+        } else {
+            listOf("All") + masterMandis.filter { it.state == selectedState }.map { it.district }.distinct()
+        }
+    }
+
+    val filteredMandis = masterMandis.filter {
+        (selectedState == "All" || it.state == selectedState) &&
+        (selectedDistrict == "All" || it.district == selectedDistrict)
+    }.sortedByDescending { it.netPayout }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = if (currentLang == "hi") "150 km मंडी भाव व शुद्ध मुनाफा (Arbitrage)" else "150km Mandi Arbitrage",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
+                    Column {
+                        Text(
+                            if (isHi) "मंडी भाव एवं आर्बिट्राज (Arbitrage)" else "Mandi Price & Spatial Arbitrage",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        )
+                        Text(
+                            if (isHi) "दिल्ली, हरियाणा व उत्तर प्रदेश (UP) 150km तुलना" else "Delhi, Haryana & UP 150km APMC Network",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -94,124 +120,56 @@ fun MandiArbitrageScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Produce Input Card
             Card(
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = if (currentLang == "hi") "फसल एवं मात्रा का चयन" else "Select Crop & Quantity",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = commodity,
-                            onValueChange = { commodity = it },
-                            label = { Text(if (currentLang == "hi") "फसल" else "Commodity") },
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1.3f)
-                        )
-                        OutlinedTextField(
-                            value = produceQuintals,
-                            onValueChange = { produceQuintals = it },
-                            label = { Text(if (currentLang == "hi") "क्विंटल" else "Quintals") },
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(0.7f)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = if (currentLang == "hi") "150 km के दायरे में मंडियां (किराया काटकर शुद्ध कमाई)" else "Nearby Mandis (Ranked by Net In-Hand Profit)",
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(sampleMandis) { item ->
-                    MandiArbitrageCard(item = item, currentLang = currentLang)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MandiArbitrageCard(
-    item: MandiArbitrageItem,
-    currentLang: String
-) {
-    val borderColor = if (item.isBestDeal) KisanEmerald else Color.Transparent
-
-    Card(
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (item.isBestDeal) Color(0xFFF0FDF4) else MaterialTheme.colorScheme.surface
-        ),
-        border = if (item.isBestDeal) androidx.compose.foundation.BorderStroke(2.dp, KisanEmerald) else null,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
             ) {
-                Column {
+                Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        text = item.mandiName,
+                        if (isHi) "📍 राज्य चुनें (Filter by State):" else "📍 Filter by State:",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color(0xFF0F172A)
+                        fontSize = 13.sp
                     )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(states) { st ->
+                            FilterChip(
+                                selected = selectedState == st,
+                                onClick = {
+                                    selectedState = st
+                                    selectedDistrict = "All"
+                                },
+                                label = { Text(if (st == "Uttar Pradesh") "UP (उत्तर प्रदेश)" else st, fontSize = 12.sp) }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "${item.district}, ${item.state} • ${item.distanceKm} km",
-                        fontSize = 12.sp,
-                        color = Color(0xFF64748B)
+                        if (isHi) "🏙️ जिला चुनें (District):" else "🏙️ Filter by District:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
                     )
-                }
-                if (item.isBestDeal) {
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = KisanEmerald,
-                        contentColor = Color.White
-                    ) {
-                        Text(
-                            text = if (currentLang == "hi") "★ सबसे ज्यादा मुनाफा" else "★ Highest Net Profit",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(districtsForState) { dst ->
+                            FilterChip(
+                                selected = selectedDistrict == dst,
+                                onClick = { selectedDistrict = dst },
+                                label = { Text(dst, fontSize = 11.sp) }
+                            )
+                        }
                     }
                 }
             }
@@ -220,19 +178,110 @@ fun MandiArbitrageCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(text = if (currentLang == "hi") "मंडी भाव" else "Mandi Rate", fontSize = 11.sp, color = Color(0xFF64748B))
-                    Text(text = "₹${item.modalPrice.toInt()}/Q", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                }
-                Column {
-                    Text(text = if (currentLang == "hi") "अनुमानित किराया" else "Freight Cost", fontSize = 11.sp, color = Color(0xFF64748B))
-                    Text(text = "-₹${item.transportCost.toInt()}", fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = Color(0xFFDC2626))
-                }
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(text = if (currentLang == "hi") "हाथ में शुद्ध कमाई" else "Net Payout", fontSize = 11.sp, color = Color(0xFF64748B))
-                    Text(text = "₹${item.netPayout.toInt()}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = KisanEmerald)
+                Text(
+                    text = if (isHi) "सक्रिय मंडियां (${filteredMandis.size})" else "Active Mandis (${filteredMandis.size})",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = if (isHi) "शुद्ध कमाई क्रम" else "Ranked by Net Profit",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(filteredMandis) { item ->
+                    val isTopDeal = filteredMandis.indexOf(item) == 0
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isTopDeal) Color(0xFFF0FDF4) else MaterialTheme.colorScheme.surface
+                        ),
+                        elevation = CardDefaults.cardElevation(if (isTopDeal) 3.dp else 1.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = item.mandiName,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                    Text(
+                                        text = "${item.district}, ${item.state} • ${item.distanceKm.toInt()} km दूर",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
+                                }
+                                if (isTopDeal) {
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = KisanEmerald
+                                    ) {
+                                        Text(
+                                            if (isHi) "सर्वोत्तम मुनाफा" else "Best Deal",
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        item.commodity,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        "${if (isHi) "मॉडल भाव: " else "Modal: "}₹${item.modalPrice.toInt()}/Q",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        if (isHi) "हाथ में शुद्ध भाव (Net)" else "Net Realization",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
+                                    Text(
+                                        "₹${item.netPayout.toInt()}/Q",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = KisanEmerald
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
