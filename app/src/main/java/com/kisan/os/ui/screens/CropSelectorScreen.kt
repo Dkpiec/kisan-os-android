@@ -139,7 +139,7 @@ fun CropSelectorScreen(
             val res = withContext(Dispatchers.IO) {
                 apiService.getCropPOP(selectedCropItem.id)
             }
-            if (res.stagesList.isNotEmpty()) {
+            if (res.growthStages.isNotEmpty()) {
                 cropDetail = res
             }
         } catch (e: Exception) {
@@ -614,7 +614,7 @@ fun CropSelectorScreen(
                                 )
                             }
 
-                            if (p.chemicalControlHi.isNotBlank() || p.chemicalControlEn.isNotBlank()) {
+                            if (!p.chemicalControlHi.isNullOrBlank() || !p.chemicalIPMEn.isNullOrBlank()) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
@@ -622,7 +622,7 @@ fun CropSelectorScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "🧪 ${if (isHi) "रासायनिक (आपातकालीन): " else "Chemical IPM: "}${if (isHi) p.chemicalControlHi else p.chemicalControlEn}",
+                                        text = "🧪 ${if (isHi) "रासायनिक (आपातकालीन): " else "Chemical IPM: "}${if (isHi) (p.chemicalControlHi ?: "") else (p.chemicalIPMEn ?: "")}",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Normal,
                                         color = Color(0xFFB91C1C),
@@ -680,7 +680,7 @@ fun CropSelectorScreen(
 
             // Tab 5: Economics & Financial Projections
             if (activePopTab == "economics") {
-                val fin = cropDetail.financials
+                val fin = cropDetail.financialAndYield
                 item {
                     Card(
                         shape = RoundedCornerShape(16.dp),
