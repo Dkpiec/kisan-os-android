@@ -75,6 +75,10 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(emptyList<AgriNewsItem>())
             }
 
+            var sprayAdvisory by remember {
+                mutableStateOf<SprayAdvisory?>(null)
+            }
+
             var isNewsLoading by remember { mutableStateOf(false) }
 
             val scope = rememberCoroutineScope()
@@ -117,6 +121,15 @@ class MainActivity : ComponentActivity() {
                         val seedsResp = withContext(Dispatchers.IO) { apiService.getSeedVarieties(lang = currentLang) }
                         if (!seedsResp["varieties"].isNullOrEmpty()) {
                             seeds = seedsResp["varieties"]!!
+                        }
+
+                        try {
+                            val adv = withContext(Dispatchers.IO) {
+                                apiService.getSprayAdvisory(temp = 28.5, humidity = 58.0, windSpeed = 8.2, rainForecast = false, stage = "vegetative", lang = currentLang)
+                            }
+                            sprayAdvisory = adv
+                        } catch (e: Exception) {
+                            // Local fallback
                         }
                     } catch (e: Exception) {
                         // Keep built-in seeds and recipes
@@ -195,7 +208,7 @@ class MainActivity : ComponentActivity() {
                                 onBack = { currentScreen = "hub" }
                             )
                             "weather_advisory" -> WeatherAdvisoryScreen(
-                                advisory = null,
+                                advisory = sprayAdvisory,
                                 currentLang = currentLang,
                                 onBack = { currentScreen = "hub" }
                             )
