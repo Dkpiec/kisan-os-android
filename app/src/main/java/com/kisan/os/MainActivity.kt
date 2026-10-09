@@ -10,10 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.kisan.os.api.KisanApiService
-import com.kisan.os.models.AgriNewsItem
-import com.kisan.os.models.DynamicTile
-import com.kisan.os.models.OrganicRecipe
-import com.kisan.os.models.SeedVariety
+import com.kisan.os.models.*
 import com.kisan.os.ui.screens.*
 import com.kisan.os.ui.theme.DarkColorScheme
 import com.kisan.os.ui.theme.LightColorScheme
