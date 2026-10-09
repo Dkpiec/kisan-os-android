@@ -94,3 +94,28 @@ data class CropSelectionAdvisory(
     val bestVarieties: String,
     val durationDays: Int
 )
+
+data class AgriNewsItem(
+    @SerializedName("id") val id: String,
+    @SerializedName("title") val title: String,
+    @SerializedName("title_hi") val titleHi: String? = null,
+    @SerializedName("title_en") val titleEn: String? = null,
+    @SerializedName("summary") val summary: String,
+    @SerializedName("summary_hi") val summaryHi: String? = null,
+    @SerializedName("summary_en") val summaryEn: String? = null,
+    @SerializedName("content") val content: String? = null,
+    @SerializedName("source_name") val sourceName: String,
+    @SerializedName("source_url") val sourceUrl: String? = null,
+    @SerializedName("image_url") val imageUrl: String? = null,
+    @SerializedName("category") val category: String = "general",
+    @SerializedName("published_at") val publishedAt: String
+)
+
+data class AgriNewsResponse(
+    @SerializedName("total") val total: Int = 0,
+    @SerializedName("count") val count: Int = 0,
+    @SerializedName("articles") val articles: List<AgriNewsItem> = emptyList(),
+    @SerializedName("news") val news: List<AgriNewsItem> = emptyList(),
+    @SerializedName("operating_hours") val operatingHours: String? = null,
+    @SerializedName("current_time_ist") val currentTimeIst: String? = null
+)

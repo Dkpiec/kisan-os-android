@@ -48,6 +48,19 @@ interface KisanApiService {
         @Query("lang") lang: String = "hi"
     ): SprayAdvisory
 
+    @GET("api/v1/news")
+    suspend fun getAgriNews(
+        @Query("category") category: String? = null,
+        @Query("lang") lang: String = "hi",
+        @Query("limit") limit: Int = 30,
+        @Query("offset") offset: Int = 0
+    ): AgriNewsResponse
+
+    @POST("api/v1/news/refresh")
+    suspend fun refreshAgriNews(
+        @Query("force") force: Boolean = true
+    ): Map<String, Any>
+
     companion object {
         fun create(baseUrl: String): KisanApiService {
             val logging = HttpLoggingInterceptor().apply {

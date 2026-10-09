@@ -161,6 +161,16 @@ fun MainHubScreen(
                     }
                 )
 
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Newspaper, contentDescription = null) },
+                    label = { Text(if (isHi) "कृषि समाचार व योजनाएं (News & Schemes)" else "Agri News & Schemes") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onTileClick("agri_news")
+                    }
+                )
+
                 Divider(modifier = Modifier.padding(vertical = 10.dp))
 
                 // Settings & Preferences
@@ -383,6 +393,7 @@ fun HubTileCard(
         "psychology" -> Icons.Default.Psychology
         "cloud" -> Icons.Default.Cloud
         "map" -> Icons.Default.Map
+        "newspaper" -> Icons.Default.Newspaper
         else -> Icons.Default.Eco
     }
 

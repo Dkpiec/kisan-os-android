@@ -1,5 +1,6 @@
 package com.kisan.os
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.kisan.os.api.KisanApiService
+import com.kisan.os.models.AgriNewsItem
 import com.kisan.os.models.DynamicTile
 import com.kisan.os.models.OrganicRecipe
 import com.kisan.os.models.SeedVariety
@@ -29,11 +31,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         apiService = KisanApiService.create(SERVER_BASE_URL)
 
+        val prefs = getSharedPreferences("kisan_prefs", Context.MODE_PRIVATE)
+        val hasSelectedLanguage = prefs.getBoolean("has_selected_language", false)
+        val savedLang = prefs.getString("selected_language", "hi") ?: "hi"
+        val savedTheme = prefs.getBoolean("is_dark_theme", false)
+
         setContent {
-            var isFirstLaunch by remember { mutableStateOf(true) }
-            var currentLang by remember { mutableStateOf("hi") }
-            var isDarkTheme by remember { mutableStateOf(false) }
-            var currentScreen by remember { mutableStateOf("hub") } // "hub", "auth", "seed_catalog", "organic_hub", "gis_polyline", "mandi_arbitrage", "protective_cultivation", "crop_selector", "weather_advisory"
+            // One-time language selection after fresh install
+            var isFirstLaunch by remember { mutableStateOf(!hasSelectedLanguage) }
+            var currentLang by remember { mutableStateOf(savedLang) }
+            var isDarkTheme by remember { mutableStateOf(savedTheme) }
+            var currentScreen by remember { mutableStateOf("hub") }
 
             // Auth State
             var isLoggedIn by remember { mutableStateOf(false) }
@@ -49,7 +57,8 @@ class MainActivity : ComponentActivity() {
                         DynamicTile("t4", "Mandi Arbitrage", "150km Mandi Arbitrage", "150km मंडी आर्बिट्राज", "market", "trending_up", "#F59E0B", "mandi_arbitrage", 4),
                         DynamicTile("t5", "Crop Selector", "Smart Crop Planning", "फसल चयन व लाभ योजना", "planning", "psychology", "#EC4899", "crop_selector", 5),
                         DynamicTile("t6", "Weather Update", "Weather & Spray Advisories", "मौसम व छिड़काव परामर्श", "weather", "cloud", "#0EA5E9", "weather_advisory", 6),
-                        DynamicTile("t7", "GIS Land Area", "GIS Land & Polyline", "खेत नक्शा व रकबा नाप", "gis", "map", "#3B82F6", "gis_polyline", 7)
+                        DynamicTile("t7", "GIS Land Area", "GIS Land & Polyline", "खेत नक्शा व रकबा नाप", "gis", "map", "#3B82F6", "gis_polyline", 7),
+                        DynamicTile("t8", "Agri News & Schemes", "Agri News & Schemes", "कृषि समाचार व योजनाएं", "news", "newspaper", "#0D9488", "agri_news", 8)
                     )
                 )
             }
@@ -62,7 +71,35 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(emptyList<OrganicRecipe>())
             }
 
+            var newsArticles by remember {
+                mutableStateOf(emptyList<AgriNewsItem>())
+            }
+
+            var isNewsLoading by remember { mutableStateOf(false) }
+
             val scope = rememberCoroutineScope()
+
+            fun fetchNews(forceRefresh: Boolean = false) {
+                scope.launch {
+                    isNewsLoading = true
+                    try {
+                        if (forceRefresh) {
+                            withContext(Dispatchers.IO) { apiService.refreshAgriNews(force = true) }
+                        }
+                        val newsResp = withContext(Dispatchers.IO) {
+                            apiService.getAgriNews(category = null, lang = currentLang, limit = 50)
+                        }
+                        val articles = if (newsResp.news.isNotEmpty()) newsResp.news else newsResp.articles
+                        if (articles.isNotEmpty()) {
+                            newsArticles = articles
+                        }
+                    } catch (e: Exception) {
+                        // Fallback gracefully
+                    } finally {
+                        isNewsLoading = false
+                    }
+                }
+            }
 
             LaunchedEffect(currentLang) {
                 scope.launch {
@@ -85,6 +122,7 @@ class MainActivity : ComponentActivity() {
                         // Keep built-in seeds and recipes
                     }
                 }
+                fetchNews(forceRefresh = false)
             }
 
             MaterialTheme(colorScheme = if (isDarkTheme) DarkColorScheme else LightColorScheme) {
@@ -97,6 +135,10 @@ class MainActivity : ComponentActivity() {
                             onLanguageSelected = { lang ->
                                 currentLang = lang
                                 isFirstLaunch = false
+                                prefs.edit()
+                                    .putBoolean("has_selected_language", true)
+                                    .putString("selected_language", lang)
+                                    .apply()
                             }
                         )
                     } else {
@@ -115,8 +157,16 @@ class MainActivity : ComponentActivity() {
                                 tiles = tiles,
                                 currentLang = currentLang,
                                 isDarkTheme = isDarkTheme,
-                                onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
-                                onThemeToggle = { isDarkTheme = !isDarkTheme },
+                                onLanguageToggle = {
+                                    val nextLang = if (currentLang == "hi") "en" else "hi"
+                                    currentLang = nextLang
+                                    prefs.edit().putString("selected_language", nextLang).apply()
+                                },
+                                onThemeToggle = {
+                                    val nextTheme = !isDarkTheme
+                                    isDarkTheme = nextTheme
+                                    prefs.edit().putBoolean("is_dark_theme", nextTheme).apply()
+                                },
                                 onTileClick = { route -> currentScreen = route },
                                 onAuthClick = { currentScreen = "auth" },
                                 isLoggedIn = isLoggedIn,
@@ -153,12 +203,27 @@ class MainActivity : ComponentActivity() {
                                 currentLang = currentLang,
                                 onBack = { currentScreen = "hub" }
                             )
+                            "agri_news" -> AgriNewsScreen(
+                                newsArticles = newsArticles,
+                                currentLang = currentLang,
+                                isLoading = isNewsLoading,
+                                onRefresh = { fetchNews(forceRefresh = true) },
+                                onBack = { currentScreen = "hub" }
+                            )
                             else -> MainHubScreen(
                                 tiles = tiles,
                                 currentLang = currentLang,
                                 isDarkTheme = isDarkTheme,
-                                onLanguageToggle = { currentLang = if (currentLang == "hi") "en" else "hi" },
-                                onThemeToggle = { isDarkTheme = !isDarkTheme },
+                                onLanguageToggle = {
+                                    val nextLang = if (currentLang == "hi") "en" else "hi"
+                                    currentLang = nextLang
+                                    prefs.edit().putString("selected_language", nextLang).apply()
+                                },
+                                onThemeToggle = {
+                                    val nextTheme = !isDarkTheme
+                                    isDarkTheme = nextTheme
+                                    prefs.edit().putBoolean("is_dark_theme", nextTheme).apply()
+                                },
                                 onTileClick = { route -> currentScreen = route },
                                 onAuthClick = { currentScreen = "auth" },
                                 isLoggedIn = isLoggedIn,
