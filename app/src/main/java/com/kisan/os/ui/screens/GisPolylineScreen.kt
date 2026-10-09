@@ -57,8 +57,8 @@ fun GisPolylineScreen(
             }
         } else {
             listOf(
-                SavedPlotItem("plot_1", "खेत #1 (नहर वाला रकबा)", 2.45, 3.92, "Uttar Pradesh", "Meerut", 28.9845, 77.7064),
-                SavedPlotItem("plot_2", "खेत #2 (ट्यूबवेल प्लॉट)", 1.20, 1.92, "Uttar Pradesh", "Meerut", 28.9820, 77.7010)
+                SavedPlotItem(id = "plot_1", plotName = "खेत #1 (नहर वाला रकबा)", areaAcres = 2.45, areaBigha = 3.92, state = "Uttar Pradesh", district = "Meerut", centroid_lat = 28.9845, centroid_lng = 77.7064),
+                SavedPlotItem(id = "plot_2", plotName = "खेत #2 (ट्यूबवेल प्लॉट)", areaAcres = 1.20, areaBigha = 1.92, state = "Uttar Pradesh", district = "Meerut", centroid_lat = 28.9820, centroid_lng = 77.7010)
             )
         }
         mutableStateOf(initialList)
