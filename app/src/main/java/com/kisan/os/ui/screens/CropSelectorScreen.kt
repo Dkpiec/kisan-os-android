@@ -122,23 +122,28 @@ fun CropSelectorScreen(
     }
 
     // Active Tab in POP
-    var activePopTab by remember { mutableStateOf("stages") } // "stages", "fertigation", "pests", "irrigation", "economics"
+    var activePopTab by remember { mutableStateOf("stages") } // "stages", "fertigation", "pests", "irrigation", "economics", "varieties"
 
-    // Detailed Crop Agronomy State
-    var cropDetail by remember { mutableStateOf<CropAgronomyDetail?>(null) }
+    // Detailed Crop Agronomy State - initialized immediately with actual crop catalog data
+    var cropDetail by remember(selectedCropItem.id) {
+        mutableStateOf(CropAgronomyCatalog.getCropDetail(selectedCropItem.id))
+    }
     var isLoadingDetail by remember { mutableStateOf(false) }
 
-    // Fetch POP from Backend on crop selection
+    // Fetch POP from Backend on crop selection and merge
     LaunchedEffect(selectedCropItem.id) {
         isLoadingDetail = true
+        // Set local real data immediately so UI never has a lag or hardcoded fallback
+        cropDetail = CropAgronomyCatalog.getCropDetail(selectedCropItem.id)
         try {
             val res = withContext(Dispatchers.IO) {
                 apiService.getCropPOP(selectedCropItem.id)
             }
-            cropDetail = res
+            if (res.stagesList.isNotEmpty()) {
+                cropDetail = res
+            }
         } catch (e: Exception) {
-            // Fallback mock detail if offline
-            cropDetail = null
+            // Keep local real data
         } finally {
             isLoadingDetail = false
         }
@@ -155,7 +160,7 @@ fun CropSelectorScreen(
                             fontSize = 16.sp
                         )
                         Text(
-                            text = if (isHi) "मौसम, खाद-उर्वरक, कीट प्रबंधन व मुनाफा" else "Lifecycle, Fertigation, Pest Control & Yield",
+                            text = if (isHi) "फसल अनुसार सटीक खाद, स्प्रे, कीट प्रबंधन व उत्पादन" else "Crop-Specific Lifecycle, Fertigation, Pests & Yield",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
@@ -300,6 +305,11 @@ fun CropSelectorScreen(
 
             // Crop Header Banner Card (Duration, Spacing, Sowing Window)
             item {
+                val duration = cropDetail.durationDays
+                val seedRate = if (isHi) cropDetail.seedRateHi else cropDetail.seedRate
+                val spacing = if (isHi) cropDetail.spacingHi else cropDetail.spacing
+                val soil = if (isHi) cropDetail.soilSuitabilityHi else cropDetail.soilSuitability
+
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = KisanEmerald),
@@ -311,60 +321,68 @@ fun CropSelectorScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = if (isHi) selectedCropItem.nameHi else selectedCropItem.nameEn,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
+                            Column {
+                                Text(
+                                    text = if (isHi) cropDetail.nameHi else cropDetail.nameEn,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 19.sp
+                                )
+                                Text(
+                                    text = "${if (isHi) cropDetail.seasonHi else cropDetail.season} • ${if (isHi) cropDetail.categoryHi else cropDetail.category}",
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 12.sp
+                                )
+                            }
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = Color.White.copy(alpha = 0.25f)
                             ) {
                                 Text(
-                                    text = "${cropDetail?.durationDays ?: 120} ${if (isHi) "दिन" else "Days"}",
+                                    text = "$duration ${if (isHi) "दिन" else "Days"}",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    fontSize = 13.sp,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column {
-                                Text(if (isHi) "बुवाई समय (Window)" else "Sowing Time", fontSize = 10.sp, color = Color.White.copy(alpha = 0.8f))
-                                Text(
-                                    cropDetail?.sowingDetails?.get("sowing_window_${if (isHi) "hi" else "en"}") ?: (if (isHi) "अक्टूबर - नवंबर" else "Oct - Nov"),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(if (isHi) "बीज दर (Seed Rate)" else "Seed Rate", fontSize = 10.sp, color = Color.White.copy(alpha = 0.8f))
                                 Text(
-                                    cropDetail?.sowingDetails?.get("seed_rate_${if (isHi) "hi" else "en"}") ?: "40-45 kg / एकड़",
+                                    seedRate,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
                             }
-                            Column {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(if (isHi) "दूरी (Spacing)" else "Spacing", fontSize = 10.sp, color = Color.White.copy(alpha = 0.8f))
                                 Text(
-                                    cropDetail?.sowingDetails?.get("spacing") ?: "20 x 5 cm",
+                                    spacing,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "🌱 ${if (isHi) "उपयुक्त मिट्टी: " else "Soil: "}$soil",
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.9f),
+                            lineHeight = 15.sp
+                        )
                     }
                 }
             }
@@ -410,20 +428,19 @@ fun CropSelectorScreen(
                             label = { Text(if (isHi) "💰 लागत व मुनाफा" else "Economics & Yield", fontSize = 12.sp) }
                         )
                     }
+                    item {
+                        FilterChip(
+                            selected = activePopTab == "varieties",
+                            onClick = { activePopTab = "varieties" },
+                            label = { Text(if (isHi) "🌾 उन्नत किस्में (Varieties)" else "Varieties", fontSize = 12.sp) }
+                        )
+                    }
                 }
             }
 
             // Tab 1: Lifecycle Stages Schedule
             if (activePopTab == "stages") {
-                val stages = cropDetail?.growthStages ?: listOf(
-                    CropStageInfo(1, "0-7 DAS", "बुवाई व अंकुरण (Germination)", "Seedling", "बीज उपचार ट्राइकोडर्मा व पलेवा नमी में बुवाई।", "Sow in moisture."),
-                    CropStageInfo(2, "20-25 DAS", "सीआरआई / कल्ले निकलना (Tillering)", "Tillering", "पहली सिंचाई (CRI) व यूरिया 25kg/एकड़ टॉप ड्रेसिंग।", "First irrigation and Urea top dressing."),
-                    CropStageInfo(3, "45-50 DAS", "गाभा अवस्था (Jointing)", "Jointing", "दूसरी सिंचाई व 19:19:19 + सूक्ष्म पोषक 2g/L स्प्रे।", "NPK spray."),
-                    CropStageInfo(4, "65-75 DAS", "बालियां निकलना (Booting / Heading)", "Heading", "तीसरी सिंचाई, 0:52:34 व बोरॉन 1g/L स्प्रे।", "Boron spray."),
-                    CropStageInfo(5, "85-95 DAS", "दाना भराव (Milking / Grain Filling)", "Grain Filling", "चौथी सिंचाई व 0:0:50 स्प्रे दाने में चमक हेतु।", "Potash spray."),
-                    CropStageInfo(6, "115-125 DAS", "परिपक्वता व कटाई (Harvest)", "Maturity", "पत्तियां पीली पड़ने पर कटाई व गहाई।", "Harvest.")
-                )
-
+                val stages = cropDetail.growthStages
                 items(stages) { stage ->
                     Card(
                         shape = RoundedCornerShape(14.dp),
@@ -493,14 +510,7 @@ fun CropSelectorScreen(
 
             // Tab 2: Fertigation & Nutrient Schedule
             if (activePopTab == "fertigation") {
-                val fertItems = cropDetail?.fertigationSchedule ?: listOf(
-                    FertigationItem("बुवाई पूर्व (Basal Dose)", "Basal Application", "DAP 50kg + MOP 20kg + SSP 50kg + Zinc 33% 5kg प्रति एकड़", "Basal NPK dose", "घनजीवामृत 100kg प्रति एकड़"),
-                    FertigationItem("प्रथम सिंचाई (21 दिन)", "1st Top Dressing (21 DAS)", "यूरिया 30kg + सल्फर 90% 3kg प्रति एकड़", "Urea top dress", "जीवामृत 200 लीटर पानी के साथ"),
-                    FertigationItem("कल्ले निकलने पर (45 दिन)", "Tillering Stage (45 DAS)", "19:19:19 घुलनशील 1kg + सूक्ष्म पोषक 250g/150L पानी", "Foliar NPK", "खट्टी छाछ 3 लीटर + जीवामृत स्प्रे"),
-                    FertigationItem("फूल व बाली (70 दिन)", "Booting Stage (70 DAS)", "0:52:34 1kg + बोरॉन 20% 150g प्रति एकड़ स्प्रे", "Boron booster", "दशपर्णी अर्क 5 लीटर स्प्रे"),
-                    FertigationItem("दाना भराव (90 दिन)", "Grain Filling (90 DAS)", "0:0:50 (पोटाश) 1kg प्रति एकड़ स्प्रे", "Potash foliar", "जीवामृत 10% फोलियर स्प्रे")
-                )
-
+                val fertItems = cropDetail.fertigationSchedule
                 items(fertItems) { item ->
                     Card(
                         shape = RoundedCornerShape(14.dp),
@@ -526,20 +536,29 @@ fun CropSelectorScreen(
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
-                                text = "${if (isHi) "रासायनिक खुराक: " else "Nutrient Dose: "}${item.dosageNPKHi}",
+                                text = "${if (isHi) "पोषक तत्व व उर्वरक: " else "Nutrient Dose: "}${if (isHi) item.dosageNPKHi else item.dosageNPKEn}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                lineHeight = 16.sp
                             )
 
                             if (!item.organicAlternative.isNullOrBlank() || !item.organicAlternativeHi.isNullOrBlank()) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "🌿 ${if (isHi) "जैविक विकल्प: " else "Organic Alt: "}${if (isHi) (item.organicAlternativeHi ?: item.organicAlternative) else item.organicAlternative}",
-                                    fontSize = 11.sp,
-                                    color = Color(0xFF059669),
-                                    fontWeight = FontWeight.Medium
-                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color(0xFF059669).copy(alpha = 0.10f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "🌿 ${if (isHi) "जैविक विकल्प: " else "Organic Alt: "}${if (isHi) (item.organicAlternativeHi ?: item.organicAlternative) else item.organicAlternative}",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFF059669),
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(8.dp),
+                                        lineHeight = 15.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -548,29 +567,7 @@ fun CropSelectorScreen(
 
             // Tab 3: Pest & Disease Management
             if (activePopTab == "pests") {
-                val pestItems = cropDetail?.pestDiseaseManagement ?: listOf(
-                    PestManagementItem(
-                        nameHi = "माहू / चेपा (Aphids)",
-                        nameEn = "Aphids",
-                        symptomsHi = "पत्तियों व बालियों से रस चूसना, पत्तियां मुड़ना व चिपचिपापन।",
-                        symptomsEn = "Sucking sap from leaves and pods.",
-                        organicRemedyHi = "नीमास्त्र 5ml/L या 5% नीम तेल स्प्रे।",
-                        organicRemedyEnVal = "Neemastra 5ml/L or 5% Neem oil.",
-                        chemicalControlHi = "इमिडाक्लोप्रिड 17.8% SL 0.5ml/L (केवल गंभीर प्रकोप में)।",
-                        chemicalIPMEnVal = "Imidacloprid 17.8% SL 0.5ml/L."
-                    ),
-                    PestManagementItem(
-                        nameHi = "पीला रतुआ / झुलसा (Yellow Rust / Blight)",
-                        nameEn = "Yellow Rust",
-                        symptomsHi = "पत्तियों पर पीले रंग की धारियां व पाउडर जैसा चूर्ण।",
-                        symptomsEn = "Yellow stripe powdery pustules on leaves.",
-                        organicRemedyHi = "खट्टी छाछ (500ml/15L पानी) या जीवामृत फोलियर स्प्रे।",
-                        organicRemedyEnVal = "Sour buttermilk 500ml/15L water spray.",
-                        chemicalControlHi = "प्रोपिकोनाजोल 25% EC 1ml/L पानी में मिलाकर छिड़कें।",
-                        chemicalIPMEnVal = "Propiconazole 25% EC 1ml/L."
-                    )
-                )
-
+                val pestItems = cropDetail.pestDiseaseManagement
                 items(pestItems) { p ->
                     Card(
                         shape = RoundedCornerShape(14.dp),
@@ -595,9 +592,10 @@ fun CropSelectorScreen(
 
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "${if (isHi) "लक्षण: " else "Symptoms: "}${if (isHi) p.symptomsHi else p.symptomsEn}",
+                                text = "${if (isHi) "लक्षण व पहचान: " else "Symptoms: "}${if (isHi) p.symptomsHi else p.symptomsEn}",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                lineHeight = 16.sp
                             )
 
                             Spacer(modifier = Modifier.height(6.dp))
@@ -611,8 +609,27 @@ fun CropSelectorScreen(
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color(0xFF059669),
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier.padding(8.dp),
+                                    lineHeight = 15.sp
                                 )
+                            }
+
+                            if (p.chemicalControlHi.isNotBlank() || p.chemicalControlEn.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color(0xFFEF4444).copy(alpha = 0.08f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "🧪 ${if (isHi) "रासायनिक (आपातकालीन): " else "Chemical IPM: "}${if (isHi) p.chemicalControlHi else p.chemicalControlEn}",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFB91C1C),
+                                        modifier = Modifier.padding(8.dp),
+                                        lineHeight = 15.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -621,14 +638,7 @@ fun CropSelectorScreen(
 
             // Tab 4: Irrigation Schedule
             if (activePopTab == "irrigation") {
-                val irrigationTips = cropDetail?.irrigationSchedule ?: listOf(
-                    "1. पलेवा सिंचाई: बुवाई से पूर्व खेत में पर्याप्त नमी हेतु पहली सिंचाई करें।",
-                    "2. पहली सिंचाई (21 दिन - CRI स्टेज): यह गेहूं की सबसे महत्वपूर्ण सिंचाई है।",
-                    "3. दूसरी सिंचाई (45 दिन - कल्ले निकलना): कल्ले व जड़ों के फैलाव हेतु।",
-                    "4. तीसरी सिंचाई (70 दिन - बाली निकलना): दाना बनने की शुरुआत में।",
-                    "5. चौथी सिंचाई (90 दिन - दाना भराव): दाना मोटा व चमकदार बनने हेतु।"
-                )
-
+                val irrigationTips = cropDetail.irrigationSchedule
                 item {
                     Card(
                         shape = RoundedCornerShape(14.dp),
@@ -670,14 +680,7 @@ fun CropSelectorScreen(
 
             // Tab 5: Economics & Financial Projections
             if (activePopTab == "economics") {
-                val fin = cropDetail?.financials ?: CropFinancials(
-                    yieldAcreQuintalsVal = "22 - 26 क्विंटल / एकड़",
-                    avgMarketPriceQuintalVal = "₹2,275 - ₹2,500 / क्विंटल",
-                    costOfCultivationAcreVal = "₹14,500 / एकड़",
-                    grossRevenueAcreVal = "₹55,000 - ₹65,000 / एकड़",
-                    netProfitAcreVal = "₹40,500 - ₹50,500 / एकड़"
-                )
-
+                val fin = cropDetail.financials
                 item {
                     Card(
                         shape = RoundedCornerShape(16.dp),
@@ -687,7 +690,7 @@ fun CropSelectorScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = if (isHi) "लागत, उत्पादन व शुद्ध मुनाफा (प्रति एकड़)" else "Economics & Net Profit (Per Acre)",
+                                text = if (isHi) "${cropDetail.nameHi} - लागत, उत्पादन व शुद्ध मुनाफा (प्रति एकड़)" else "Economics & Net Profit (Per Acre)",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = KisanEmerald
@@ -708,8 +711,8 @@ fun CropSelectorScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(if (isHi) "बाजार भाव (Mandi Price):" else "Avg Price:", fontSize = 13.sp)
-                                Text(fin.avgMarketPriceQuintal, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(if (isHi) "कुल खेती लागत (Cost):" else "Cultivation Cost:", fontSize = 13.sp)
+                                Text(fin.costOfCultivationAcre, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFFDC2626))
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -717,8 +720,8 @@ fun CropSelectorScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(if (isHi) "कुल खेती लागत (Cost):" else "Cultivation Cost:", fontSize = 13.sp)
-                                Text(fin.costOfCultivationAcre, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFFDC2626))
+                                Text(if (isHi) "अनुमानित सकल आय (Gross):" else "Gross Realization:", fontSize = 13.sp)
+                                Text(fin.grossRevenueAcre, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = KisanAmber)
                             }
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -736,7 +739,7 @@ fun CropSelectorScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column {
-                                        Text(if (isHi) "अनुमानित शुद्ध मुनाफा" else "Estimated Net Profit", fontSize = 11.sp, color = Color(0xFF059669))
+                                        Text(if (isHi) "अनुमानित शुद्ध मुनाफा (Net Profit)" else "Estimated Net Profit", fontSize = 11.sp, color = Color(0xFF059669))
                                         Text(
                                             text = fin.netProfitAcre,
                                             fontWeight = FontWeight.ExtraBold,
@@ -745,6 +748,41 @@ fun CropSelectorScreen(
                                         )
                                     }
                                     Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFF059669), modifier = Modifier.size(32.dp))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Tab 6: Recommended Varieties
+            if (activePopTab == "varieties") {
+                val varieties = if (isHi) cropDetail.recommendedVarietiesHi else cropDetail.recommendedVarieties
+                item {
+                    Card(
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = if (isHi) "सर्वोत्तम प्रमाणित व हाइब्रिड किस्में" else "Recommended Certified & Hybrid Varieties",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = KisanEmerald
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            varieties.forEach { v ->
+                                Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = KisanAmber, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = v,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                             }
                         }
