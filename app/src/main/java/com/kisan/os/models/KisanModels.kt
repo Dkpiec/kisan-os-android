@@ -119,3 +119,73 @@ data class AgriNewsResponse(
     @SerializedName("operating_hours") val operatingHours: String? = null,
     @SerializedName("current_time_ist") val currentTimeIst: String? = null
 )
+
+data class CropStageInfo(
+    @SerializedName("stage_num") val stageNum: Int,
+    @SerializedName("name_en") val nameEn: String,
+    @SerializedName("name_hi") val nameHi: String,
+    @SerializedName("days_after_sowing") val das: String,
+    @SerializedName("key_operations_en") val operationsEn: String,
+    @SerializedName("key_operations_hi") val operationsHi: String
+)
+
+data class FertigationItem(
+    @SerializedName("timing_en") val timingEn: String,
+    @SerializedName("timing_hi") val timingHi: String,
+    @SerializedName("fertilizers_en") val fertilizersEn: String,
+    @SerializedName("fertilizers_hi") val fertilizersHi: String,
+    @SerializedName("organic_alternative_hi") val organicAlternativeHi: String? = null
+)
+
+data class PestManagementItem(
+    @SerializedName("name_en") val nameEn: String,
+    @SerializedName("name_hi") val nameHi: String,
+    @SerializedName("symptoms_en") val symptomsEn: String,
+    @SerializedName("symptoms_hi") val symptomsHi: String,
+    @SerializedName("organic_remedy_hi") val organicRemedyHi: String,
+    @SerializedName("chemical_control_hi") val chemicalControlHi: String? = null
+)
+
+data class CropFinancials(
+    @SerializedName("expected_yield_quintal_per_acre") val expectedYield: String,
+    @SerializedName("cost_of_cultivation_per_acre_inr") val costOfCultivation: String,
+    @SerializedName("gross_revenue_inr") val grossRevenue: String,
+    @SerializedName("net_profit_per_acre_inr") val netProfit: String,
+    @SerializedName("profitability_rating") val profitabilityRating: Double = 4.8
+)
+
+data class CropAgronomyDetail(
+    @SerializedName("id") val id: String,
+    @SerializedName("name_en") val nameEn: String,
+    @SerializedName("name_hi") val nameHi: String,
+    @SerializedName("category") val category: String,
+    @SerializedName("category_hi") val categoryHi: String,
+    @SerializedName("season") val season: String,
+    @SerializedName("season_hi") val seasonHi: String,
+    @SerializedName("duration_days") val durationDays: Int,
+    @SerializedName("soil_suitability") val soilSuitability: String,
+    @SerializedName("soil_suitability_hi") val soilSuitabilityHi: String,
+    @SerializedName("seed_rate_per_acre") val seedRate: String,
+    @SerializedName("seed_rate_per_acre_hi") val seedRateHi: String,
+    @SerializedName("spacing") val spacing: String,
+    @SerializedName("spacing_hi") val spacingHi: String,
+    @SerializedName("recommended_varieties") val recommendedVarieties: List<String> = emptyList(),
+    @SerializedName("recommended_varieties_hi") val recommendedVarietiesHi: List<String> = emptyList(),
+    @SerializedName("stages") val stages: List<CropStageInfo> = emptyList(),
+    @SerializedName("fertigation_schedule") val fertigationSchedule: List<FertigationItem> = emptyList(),
+    @SerializedName("pest_disease_management") val pestDiseaseManagement: List<PestManagementItem> = emptyList(),
+    @SerializedName("irrigation_details_hi") val irrigationDetailsHi: String? = null,
+    @SerializedName("financials") val financials: CropFinancials? = null
+)
+
+data class SavedPlotItem(
+    @SerializedName("id") val id: String,
+    @SerializedName("plot_name") val plotName: String,
+    @SerializedName("area_acres") val areaAcres: Double,
+    @SerializedName("area_bigha") val areaBigha: Double? = null,
+    @SerializedName("state") val state: String = "Uttar Pradesh",
+    @SerializedName("district") val district: String = "Meerut",
+    @SerializedName("centroid_lat") val lat: Double = 28.6139,
+    @SerializedName("centroid_lng") val lng: Double = 77.2090,
+    @SerializedName("coordinates") val coordinates: List<List<Double>> = emptyList()
+)

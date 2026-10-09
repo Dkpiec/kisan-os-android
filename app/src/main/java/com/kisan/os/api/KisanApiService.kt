@@ -61,6 +61,35 @@ interface KisanApiService {
         @Query("force") force: Boolean = true
     ): Map<String, Any>
 
+    @GET("api/v1/crops/seasons")
+    suspend fun getCropSeasons(): Map<String, Any>
+
+    @GET("api/v1/crops/list")
+    suspend fun getCropsList(
+        @Query("season") season: String? = null,
+        @Query("category") category: String? = null
+    ): Map<String, Any>
+
+    @GET("api/v1/crops/{crop_id}/pop")
+    suspend fun getCropPOP(
+        @Path("crop_id") cropId: String
+    ): CropAgronomyDetail
+
+    @GET("api/v1/land/plots")
+    suspend fun getSavedPlots(
+        @Query("user_id") userId: String = "usr_guest"
+    ): Map<String, Any>
+
+    @POST("api/v1/land/plots")
+    suspend fun savePlot(
+        @Body payload: Map<String, Any>
+    ): Map<String, Any>
+
+    @DELETE("api/v1/land/plots/{plot_id}")
+    suspend fun deletePlot(
+        @Path("plot_id") plotId: String
+    ): Map<String, Any>
+
     companion object {
         fun create(baseUrl: String): KisanApiService {
             val logging = HttpLoggingInterceptor().apply {

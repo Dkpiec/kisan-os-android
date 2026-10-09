@@ -202,6 +202,7 @@ class MainActivity : ComponentActivity() {
                             )
                             "crop_selector" -> CropSelectorScreen(
                                 currentLang = currentLang,
+                                apiService = apiService,
                                 onBack = { currentScreen = "hub" }
                             )
                             "weather_advisory" -> WeatherAdvisoryScreen(
