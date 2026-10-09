@@ -354,7 +354,7 @@ fun SeedCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Restaurant,
+                            imageVector = Icons.Default.Star,
                             contentDescription = null,
                             tint = Color(0xFF475569),
                             modifier = Modifier.size(18.dp)

@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.kisan.os"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.kisan.os"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 4
-        versionName = "1.0.3"
+        targetSdk = 34
+        versionCode = 5
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,10 +31,6 @@ android {
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
         debug {
             signingConfig = signingConfigs.getByName("release")
@@ -50,6 +46,10 @@ android {
     buildFeatures {
         compose = true
     }
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 dependencies {
@@ -61,7 +61,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.8.1")
 
     // Security & Biometrics

@@ -113,14 +113,14 @@ fun WeatherAdvisoryScreen(
                         title = if (isHi) "तापमान (Temp)" else "Temperature",
                         value = "28.5°C",
                         subtitle = if (isHi) "दिन का अधिकतम 32°C" else "Max today 32°C",
-                        icon = Icons.Default.Thermostat,
+                        icon = Icons.Default.Info,
                         modifier = Modifier.weight(1f)
                     )
                     WeatherMetricCard(
                         title = if (isHi) "हवा की गति (Wind)" else "Wind Speed",
                         value = "8.2 km/h",
                         subtitle = if (isHi) "पश्चिम दिशा (West)" else "Direction: West",
-                        icon = Icons.Default.Air,
+                        icon = Icons.Default.CheckCircle,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -133,14 +133,14 @@ fun WeatherAdvisoryScreen(
                         title = if (isHi) "आर्द्रता (Humidity)" else "Rel. Humidity",
                         value = "54%",
                         subtitle = if (isHi) "फफूंद जोखिम कम" else "Low Fungal Risk",
-                        icon = Icons.Default.WaterDrop,
+                        icon = Icons.Default.Star,
                         modifier = Modifier.weight(1f)
                     )
                     WeatherMetricCard(
                         title = if (isHi) "वर्षा संभावना (Rain)" else "Precipitation",
                         value = "5%",
                         subtitle = if (isHi) "आसमान साफ रहेगा" else "Clear Skies",
-                        icon = Icons.Default.CloudQueue,
+                        icon = Icons.Default.Notifications,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -224,7 +224,7 @@ fun AdvisoryAlertCard(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = if (urgency == "High") Icons.Default.PriorityHigh else Icons.Default.TipsAndUpdates,
+                        imageVector = if (urgency == "High") Icons.Default.Warning else Icons.Default.Info,
                         contentDescription = null,
                         tint = if (urgency == "High") KisanAmber else KisanEmerald,
                         modifier = Modifier.size(20.dp)

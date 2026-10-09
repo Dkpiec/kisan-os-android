@@ -199,7 +199,7 @@ fun GisPolylineScreen(
                             }
                         ) {
                             Icon(
-                                Icons.Default.Undo,
+                                Icons.Default.Refresh,
                                 contentDescription = "Undo",
                                 tint = Color.White,
                                 modifier = Modifier.padding(8.dp)
@@ -342,7 +342,7 @@ fun GisPolylineScreen(
                     .fillMaxWidth()
                     .height(48.dp)
             ) {
-                Icon(Icons.Default.Save, contentDescription = null)
+                Icon(Icons.Default.Check, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = if (isHi) "इस खेत का रकबा सहेजें (Save Plot)" else "Save Farm Boundary",

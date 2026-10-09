@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val SERVER_BASE_URL = "https://outcome-lift-future-holdings.trycloudflare.com/"
+const val SERVER_BASE_URL = "https://pest-procurement-dynamic-eden.trycloudflare.com/"
 
 class MainActivity : ComponentActivity() {
 

@@ -63,7 +63,7 @@ fun MainHubScreen(
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Default.Spa, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
+                                Icon(Icons.Default.Star, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -92,7 +92,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Spa, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
                     label = { Text(if (isHi) "बीज कैटलॉग (Seed Catalogue)" else "Seed Catalogue") },
                     selected = false,
                     onClick = {
@@ -102,7 +102,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Biotech, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
                     label = { Text(if (isHi) "जैविक खेती (Organic Farming)" else "Organic Farming") },
                     selected = false,
                     onClick = {
@@ -112,7 +112,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Roofing, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
                     label = { Text(if (isHi) "संरक्षित खेती (Protective Cultivation)" else "Protective Cultivation") },
                     selected = false,
                     onClick = {
@@ -122,7 +122,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
+                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
                     label = { Text(if (isHi) "मंडी आर्बिट्राज (Mandi Arbitrage)" else "Mandi Arbitrage") },
                     selected = false,
                     onClick = {
@@ -132,7 +132,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Psychology, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Favorite, contentDescription = null) },
                     label = { Text(if (isHi) "फसल चयनकर्ता (Crop Selector)" else "Crop Selector") },
                     selected = false,
                     onClick = {
@@ -142,7 +142,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Cloud, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
                     label = { Text(if (isHi) "मौसम अपडेट (Weather Update)" else "Weather Update") },
                     selected = false,
                     onClick = {
@@ -152,7 +152,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Search, contentDescription = null) },
                     label = { Text(if (isHi) "खेत रकबा नाप (GIS Land Area)" else "GIS Land Area") },
                     selected = false,
                     onClick = {
@@ -162,7 +162,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Newspaper, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Email, contentDescription = null) },
                     label = { Text(if (isHi) "कृषि समाचार व योजनाएं (News & Schemes)" else "Agri News & Schemes") },
                     selected = false,
                     onClick = {
@@ -175,7 +175,7 @@ fun MainHubScreen(
 
                 // Settings & Preferences
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Language, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                     label = { Text(if (isHi) "भाषा बदलें (Language: हिन्दी)" else "Change Language (English)") },
                     selected = false,
                     onClick = {
@@ -184,7 +184,7 @@ fun MainHubScreen(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
                     label = { Text(if (isDarkTheme) (if (isHi) "लाइट थीम (Light Mode)" else "Light Mode") else (if (isHi) "डार्क थीम (Dark Mode)" else "Dark Mode")) },
                     selected = false,
                     onClick = {
@@ -216,7 +216,7 @@ fun MainHubScreen(
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
-                                        imageVector = Icons.Default.Agriculture,
+                                        imageVector = Icons.Default.Star,
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size(24.dp)
@@ -262,7 +262,7 @@ fun MainHubScreen(
                         // Theme Switcher Icon
                         IconButton(onClick = onThemeToggle) {
                             Icon(
-                                imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                imageVector = Icons.Default.Refresh,
                                 contentDescription = "Toggle Theme",
                                 tint = if (isDarkTheme) KisanAmber else MaterialTheme.colorScheme.onSurface
                             )
@@ -313,7 +313,7 @@ fun MainHubScreen(
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = Icons.Default.WbSunny,
+                                    imageVector = Icons.Default.Star,
                                     contentDescription = null,
                                     tint = KisanAmber,
                                     modifier = Modifier.size(28.dp)
@@ -335,7 +335,7 @@ fun MainHubScreen(
                             )
                         }
                         Icon(
-                            imageVector = Icons.Default.ChevronRight,
+                            imageVector = Icons.Default.ArrowForward,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         )
@@ -386,15 +386,15 @@ fun HubTileCard(
     }
 
     val iconVector: ImageVector = when (tile.icon) {
-        "spa" -> Icons.Default.Spa
-        "biotech" -> Icons.Default.Biotech
-        "roofing" -> Icons.Default.Roofing
-        "trending_up" -> Icons.Default.TrendingUp
-        "psychology" -> Icons.Default.Psychology
-        "cloud" -> Icons.Default.Cloud
-        "map" -> Icons.Default.Map
-        "newspaper" -> Icons.Default.Newspaper
-        else -> Icons.Default.Eco
+        "spa" -> Icons.Default.Star
+        "biotech" -> Icons.Default.Info
+        "roofing" -> Icons.Default.Home
+        "trending_up" -> Icons.Default.ShoppingCart
+        "psychology" -> Icons.Default.Favorite
+        "cloud" -> Icons.Default.Notifications
+        "map" -> Icons.Default.Search
+        "newspaper" -> Icons.Default.Email
+        else -> Icons.Default.Star
     }
 
     val displayTitle = if (currentLang == "hi") tile.titleHi else tile.titleEn
