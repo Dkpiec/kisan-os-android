@@ -333,7 +333,7 @@ fun WeatherAdvisoryScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            imageVector = if (isOverallSpraySafe) Icons.Default.CheckCircle else Icons.Default.Warning,
+                            imageVector = if (isOverallSpraySafe) Icons.Default.Check else Icons.Default.Warning,
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(44.dp)
@@ -389,7 +389,7 @@ fun WeatherAdvisoryScreen(
                         title = if (isHi) "हवा की गति (Wind)" else "Wind Speed",
                         value = "${String.format("%.1f", currentWind)} km/h",
                         subtitle = if (currentWind <= selectedCrop.safeWindMax) (if (isHi) "शांत हवा (Safe)" else "Calm wind") else (if (isHi) "तेज हवा (Drift Risk)" else "High Drift"),
-                        icon = Icons.Default.CheckCircle,
+                        icon = Icons.Default.Check,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -409,7 +409,7 @@ fun WeatherAdvisoryScreen(
                         title = if (isHi) "वर्षा संभावना (Rain)" else "Precipitation",
                         value = "4%",
                         subtitle = if (isHi) "आसमान साफ रहेगा" else "Clear Skies",
-                        icon = Icons.Default.Notifications,
+                        icon = Icons.Default.Info,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -669,6 +669,90 @@ fun WeatherAdvisoryScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun WeatherMetricCard(
+    title: String,
+    value: String,
+    subtitle: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(title, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Icon(icon, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(16.dp))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(value, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(subtitle, fontSize = 10.sp, color = KisanEmerald)
+        }
+    }
+}
+
+@Composable
+fun AdvisoryAlertCard(
+    title: String,
+    desc: String,
+    urgency: String = "Normal"
+) {
+    val isHigh = urgency == "High"
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isHigh) Color(0xFFFEF2F2) else MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = if (isHigh) Color(0xFFDC2626) else MaterialTheme.colorScheme.onSurface
+                )
+                if (isHigh) {
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = Color(0xFFDC2626)
+                    ) {
+                        Text(
+                            text = "जरूरी",
+                            color = Color.White,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = desc,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                lineHeight = 16.sp
+            )
         }
     }
 }

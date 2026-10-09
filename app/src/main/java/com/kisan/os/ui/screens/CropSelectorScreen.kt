@@ -272,7 +272,7 @@ fun CropSelectorScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Eco, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column {
                                         Text(text = if (isHi) "चयनित फसल (Selected Crop)" else "Selected Crop", fontSize = 10.sp, color = KisanEmerald)
@@ -520,22 +520,22 @@ fun CropSelectorScreen(
                                     fontSize = 14.sp,
                                     color = KisanEmerald
                                 )
-                                Icon(Icons.Default.Science, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Info, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(18.dp))
                             }
 
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
-                                text = "${if (isHi) "रासायनिक खुराक: " else "Nutrient Dose: "}${item.chemicalDose}",
+                                text = "${if (isHi) "रासायनिक खुराक: " else "Nutrient Dose: "}${item.dosageNPKHi}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
-                            if (!item.organicAlternative.isNullOrBlank()) {
+                            if (!item.organicAlternative.isNullOrBlank() || !item.organicAlternativeHi.isNullOrBlank()) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "🌿 ${if (isHi) "जैविक विकल्प: " else "Organic Alt: "}${item.organicAlternative}",
+                                    text = "🌿 ${if (isHi) "जैविक विकल्प: " else "Organic Alt: "}${if (isHi) (item.organicAlternativeHi ?: item.organicAlternative) else item.organicAlternative}",
                                     fontSize = 11.sp,
                                     color = Color(0xFF059669),
                                     fontWeight = FontWeight.Medium
@@ -550,24 +550,24 @@ fun CropSelectorScreen(
             if (activePopTab == "pests") {
                 val pestItems = cropDetail?.pestDiseaseManagement ?: listOf(
                     PestManagementItem(
-                        pestNameHi = "माहू / चेपा (Aphids)",
-                        pestNameEn = "Aphids",
+                        nameHi = "माहू / चेपा (Aphids)",
+                        nameEn = "Aphids",
                         symptomsHi = "पत्तियों व बालियों से रस चूसना, पत्तियां मुड़ना व चिपचिपापन।",
                         symptomsEn = "Sucking sap from leaves and pods.",
                         organicRemedyHi = "नीमास्त्र 5ml/L या 5% नीम तेल स्प्रे।",
-                        organicRemedyEn = "Neemastra 5ml/L or 5% Neem oil.",
-                        chemicalIPMHi = "इमिडाक्लोप्रिड 17.8% SL 0.5ml/L (केवल गंभीर प्रकोप में)।",
-                        chemicalIPMEn = "Imidacloprid 17.8% SL 0.5ml/L."
+                        organicRemedyEnVal = "Neemastra 5ml/L or 5% Neem oil.",
+                        chemicalControlHi = "इमिडाक्लोप्रिड 17.8% SL 0.5ml/L (केवल गंभीर प्रकोप में)।",
+                        chemicalIPMEnVal = "Imidacloprid 17.8% SL 0.5ml/L."
                     ),
                     PestManagementItem(
-                        pestNameHi = "पीला रतुआ / झुलसा (Yellow Rust / Blight)",
-                        pestNameEn = "Yellow Rust",
+                        nameHi = "पीला रतुआ / झुलसा (Yellow Rust / Blight)",
+                        nameEn = "Yellow Rust",
                         symptomsHi = "पत्तियों पर पीले रंग की धारियां व पाउडर जैसा चूर्ण।",
                         symptomsEn = "Yellow stripe powdery pustules on leaves.",
                         organicRemedyHi = "खट्टी छाछ (500ml/15L पानी) या जीवामृत फोलियर स्प्रे।",
-                        organicRemedyEn = "Sour buttermilk 500ml/15L water spray.",
-                        chemicalIPMHi = "प्रोपिकोनाजोल 25% EC 1ml/L पानी में मिलाकर छिड़कें।",
-                        chemicalIPMEn = "Propiconazole 25% EC 1ml/L."
+                        organicRemedyEnVal = "Sour buttermilk 500ml/15L water spray.",
+                        chemicalControlHi = "प्रोपिकोनाजोल 25% EC 1ml/L पानी में मिलाकर छिड़कें।",
+                        chemicalIPMEnVal = "Propiconazole 25% EC 1ml/L."
                     )
                 )
 
@@ -590,7 +590,7 @@ fun CropSelectorScreen(
                                     fontSize = 15.sp,
                                     color = Color(0xFFDC2626)
                                 )
-                                Icon(Icons.Default.BugReport, contentDescription = null, tint = Color(0xFFDC2626), modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFDC2626), modifier = Modifier.size(18.dp))
                             }
 
                             Spacer(modifier = Modifier.height(4.dp))
@@ -648,12 +648,12 @@ fun CropSelectorScreen(
                                     fontSize = 15.sp,
                                     color = KisanEmerald
                                 )
-                                Icon(Icons.Default.WaterDrop, contentDescription = null, tint = KisanEmerald)
+                                Icon(Icons.Default.Info, contentDescription = null, tint = KisanEmerald)
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             irrigationTips.forEach { tip ->
                                 Row(modifier = Modifier.padding(vertical = 4.dp)) {
-                                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = KisanEmerald, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = tip,
@@ -671,11 +671,11 @@ fun CropSelectorScreen(
             // Tab 5: Economics & Financial Projections
             if (activePopTab == "economics") {
                 val fin = cropDetail?.financials ?: CropFinancials(
-                    yieldAcreQuintals = "22 - 26 क्विंटल / एकड़",
-                    avgMarketPriceQuintal = "₹2,275 - ₹2,500 / क्विंटल",
-                    costOfCultivationAcre = "₹14,500 / एकड़",
-                    grossRevenueAcre = "₹55,000 - ₹65,000 / एकड़",
-                    netProfitAcre = "₹40,500 - ₹50,500 / एकड़"
+                    yieldAcreQuintalsVal = "22 - 26 क्विंटल / एकड़",
+                    avgMarketPriceQuintalVal = "₹2,275 - ₹2,500 / क्विंटल",
+                    costOfCultivationAcreVal = "₹14,500 / एकड़",
+                    grossRevenueAcreVal = "₹55,000 - ₹65,000 / एकड़",
+                    netProfitAcreVal = "₹40,500 - ₹50,500 / एकड़"
                 )
 
                 item {
@@ -744,7 +744,7 @@ fun CropSelectorScreen(
                                             color = Color(0xFF059669)
                                         )
                                     }
-                                    Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = Color(0xFF059669), modifier = Modifier.size(32.dp))
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFF059669), modifier = Modifier.size(32.dp))
                                 }
                             }
                         }
@@ -877,7 +877,7 @@ fun CropSelectorScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 15.sp
                                 )
-                                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = KisanEmerald)
+                                Icon(Icons.Default.ArrowForward, contentDescription = null, tint = KisanEmerald)
                             }
                         }
                     }

@@ -253,12 +253,12 @@ fun GisPolylineScreen(
                 actions = {
                     // Multi-Land List Button
                     IconButton(onClick = { showPlotsListSheet = true }) {
-                        Icon(Icons.Default.Folder, contentDescription = "Saved Lands", tint = KisanEmerald)
+                        Icon(Icons.Default.List, contentDescription = "Saved Lands", tint = KisanEmerald)
                     }
                     // Satellite vs Normal Map Toggle
                     IconButton(onClick = { isSatelliteView = !isSatelliteView }) {
                         Icon(
-                            imageVector = if (isSatelliteView) Icons.Default.Layers else Icons.Default.Map,
+                            imageVector = if (isSatelliteView) Icons.Default.Info else Icons.Default.LocationOn,
                             contentDescription = "Layer Toggle",
                             tint = KisanAmber
                         )
@@ -507,7 +507,7 @@ fun GisPolylineScreen(
                                 .weight(1f)
                                 .height(46.dp)
                         ) {
-                            Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(if (isHi) "खेत सूची" else "My Lands", fontSize = 13.sp)
                         }
@@ -527,7 +527,7 @@ fun GisPolylineScreen(
                                 .weight(1.5f)
                                 .height(46.dp)
                         ) {
-                            Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = if (isHi) "यह खेत सहेजें" else "Save Farm Plot",
